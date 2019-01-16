@@ -31,4 +31,4 @@ target/
 #Gradle
 .gradle
 build
-gradle.properties
+local.properties
