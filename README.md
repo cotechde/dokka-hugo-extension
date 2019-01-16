@@ -22,3 +22,8 @@ dokka {
     dokkaFatJar = files('libs/dokka-hugo-all.jar')
 }
 ```
+
+## Credits
+
+* Structure borrowed from https://github.com/ScaCap/spring-auto-restdocs/tree/master/spring-auto-restdocs-dokka-json
+* https://medium.com/@flbenz/how-does-kotlins-documentation-engine-dokka-work-and-can-it-be-extended-5e83dc663ef7
