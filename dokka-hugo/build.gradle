@@ -11,8 +11,5 @@ compileTestKotlin {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-    testCompile "junit:junit:4.12"
     compile "org.jetbrains.dokka:dokka-fatjar:0.9.17"
 }
