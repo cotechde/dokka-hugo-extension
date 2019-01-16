@@ -1,0 +1,18 @@
+buildscript {
+    ext.kotlin_version = "1.2.51"
+    
+    repositories {
+        jcenter()
+    }
+    
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.3"
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
