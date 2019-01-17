@@ -23,15 +23,17 @@ open class HugoOutputBuilder(to: StringBuilder,
     }
 
     protected open fun appendFrontMatter(nodes: Iterable<DocumentationNode>, to: StringBuilder) {
-        to.appendln("""title = "${getPageTitle(nodes)}"""")
+        to.appendln("""title = "${getPageLinkTitle(nodes)}"""")
         to.appendln("""draft = false""")
         to.appendln("""toc = false""")
         to.appendln("""type = "javadocs"""")
-        // TODO: only if it's a package and only show package name, not " - hw-security"
-        to.appendln("""linktitle = "${getPageTitle(nodes)}"""")
-        to.appendln("""[menu.docs]""")
-        to.appendln("""  parent = "Packages"""")
-        to.appendln("""  weight = 1""")
+
+        if (isPackage(nodes)) {
+            to.appendln("""linktitle = "${getPageLinkTitle(nodes)}"""")
+            to.appendln("""[menu.docs]""")
+            to.appendln("""  parent = "Packages"""")
+            to.appendln("""  weight = 1""")
+        }
     }
     
     // Hugo markdown (blackfriday) requires table headers
@@ -65,6 +67,52 @@ open class HugoOutputBuilder(to: StringBuilder,
             super.appendListItem(body)
         }
     }
+    
+    private fun isPackage(nodes: Iterable<DocumentationNode>): Boolean {
+        val node = nodes.singleOrNull()
+        
+        if (node?.kind == NodeKind.Package) {
+            return true
+        }      
+        return false
+    }
+    
+    fun getPageLinkTitle(nodes: Iterable<DocumentationNode>): String? {
+        val breakdownByLocation = nodes.groupBy { node -> formatPageLinkTitle(node) }
+        return breakdownByLocation.keys.singleOrNull()
+    }
+
+    fun formatPageLinkTitle(node: DocumentationNode): String {
+        val path = node.path
+        val moduleName = path.first().name
+        if (path.size == 1) {
+            return moduleName
+        }
+
+        val qName = qualifiedNameForPageTitle(node)
+        return qName
+    }
+    
+    // from HtmlFormatService.kt
+    private fun qualifiedNameForPageTitle(node: DocumentationNode): String {
+        if (node.kind == NodeKind.Package) {
+            var packageName = node.qualifiedName()
+            if (packageName.isEmpty()) {
+                packageName = "root package"
+            }
+            return packageName
+        }
+
+        val path = node.path
+        var pathFromToplevelMember = path.dropWhile { it.kind !in NodeKind.classLike }
+        if (pathFromToplevelMember.isEmpty()) {
+            pathFromToplevelMember = path.dropWhile { it.kind != NodeKind.Property && it.kind != NodeKind.Function }
+        }
+        if (pathFromToplevelMember.isNotEmpty()) {
+            return pathFromToplevelMember.map { it.name }.filter { it.length > 0 }.joinToString(".")
+        }
+        return node.qualifiedName()
+    }
 }
 
 
@@ -79,7 +127,7 @@ open class HugoFormatService(
             generator: NodeLocationAwareGenerator,
             signatureGenerator: LanguageService,
             @Named(impliedPlatformsName) impliedPlatforms: List<String>
-    ) : this(generator, signatureGenerator, "md", impliedPlatforms)
+    ) : this(generator, signatureGenerator, "html", impliedPlatforms)
 
     override fun createOutputBuilder(to: StringBuilder, location: Location): FormattedOutputBuilder =
             HugoOutputBuilder(to, location, generator, languageService, extension, impliedPlatforms)
