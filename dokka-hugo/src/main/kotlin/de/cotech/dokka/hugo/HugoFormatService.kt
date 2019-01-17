@@ -21,7 +21,20 @@ open class HugoOutputBuilder(to: StringBuilder,
     }
 
     protected open fun appendFrontMatter(nodes: Iterable<DocumentationNode>, to: StringBuilder) {
-        to.appendln("title = ${getPageTitle(nodes)}")
+        to.appendln("""title = "${getPageTitle(nodes)}"""")
+        to.appendln("""draft = false""")
+        to.appendln("""toc = true""")
+        to.appendln("""type = "javadocs"""")
+        to.appendln("""linktitle = "${getPageTitle(nodes)}"""")
+        to.appendln("""[menu.docs]""")
+        to.appendln("""  parent = "Dokka"""")
+        to.appendln("""  weight = 1""")
+    }
+    
+    override fun appendTable(vararg columns: String, body: () -> Unit) {
+        to.appendln(columns.joinToString(" | ", "| ", " |"))
+        to.appendln("|" + "---|".repeat(columns.size))
+        body()
     }
 }
 
