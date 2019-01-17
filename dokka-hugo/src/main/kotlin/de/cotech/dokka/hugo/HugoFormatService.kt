@@ -5,7 +5,7 @@ import com.google.inject.name.Named
 import org.jetbrains.dokka.*
 import org.jetbrains.dokka.Utilities.impliedPlatformsName
 
-// TODO: prepend _index.md instead of index.md
+// TODO: use _index.md instead of index.md
 
 open class HugoOutputBuilder(to: StringBuilder,
                                location: Location,
@@ -31,7 +31,7 @@ open class HugoOutputBuilder(to: StringBuilder,
         if (isPackage(nodes)) {
             to.appendln("""linktitle = "${getPageLinkTitle(nodes)}"""")
             to.appendln("""[menu.docs]""")
-            to.appendln("""  parent = "Packages"""")
+            to.appendln("""  parent = "API Reference"""")
             to.appendln("""  weight = 1""")
         }
     }

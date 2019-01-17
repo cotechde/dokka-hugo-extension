@@ -11,12 +11,24 @@ compileTestKotlin {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$bundled_kotlin_compiler_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$bundled_kotlin_compiler_version"
+    //compile "org.jetbrains.kotlin:kotlin-stdlib:$bundled_kotlin_compiler_version"
+    //compile "org.jetbrains.kotlin:kotlin-reflect:$bundled_kotlin_compiler_version"
     
 
-    compile "org.jetbrains.kotlin:kotlin-compiler:$bundled_kotlin_compiler_version"
-    compile "org.jetbrains.kotlin:kotlin-script-runtime:$bundled_kotlin_compiler_version"
+    //compile "org.jetbrains.kotlin:kotlin-compiler:$bundled_kotlin_compiler_version"
+    //compile "org.jetbrains.kotlin:kotlin-script-runtime:$bundled_kotlin_compiler_version"
 
     compile "org.jetbrains.dokka:dokka-fatjar:0.9.17"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.jetbrains.dokka.MainKt'
+    }
+}
+
+shadowJar {
+   baseName = 'dokka-hugo-fatjar-0.9.17'
+   classifier = null
+   version = null
 }
