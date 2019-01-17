@@ -1,3 +1,6 @@
+
+NOTE: This is in an experimental state!
+
 # Dokka Hugo Extension
 
 This library is a [Dokka](https://github.com/Kotlin/dokka) extension.
@@ -17,11 +20,17 @@ This extension is build as a fat-jar, i.e., it includes all dependenices in a si
 Put into your projects libs folder and configure dokka:
 
 ```groovy
+
+// NOTE: Looks like this currently does not work reliably.
 dokka {
     outputFormat = "hugo"
-    dokkaFatJar = files('libs/dokka-hugo-all.jar')
+    dokkaFatJar = files('libs/dokka-hugo-fatjar-0.9.17.jar')
 }
 ```
+
+## Using the Command Line
+
+Use the resulting fat jar on the command line as described in [dokka's README](https://github.com/Kotlin/dokka#using-the-command-line)
 
 ## Credits
 
