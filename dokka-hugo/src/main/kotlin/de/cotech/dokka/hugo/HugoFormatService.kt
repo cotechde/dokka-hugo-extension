@@ -73,7 +73,7 @@ open class HugoOutputBuilder(to: StringBuilder,
         to.appendln("{{% md %}}")
         body()
         to.appendln("{{% /md %}}")
-        to.appendln("\n</td>")
+        to.appendln("</td>")
 }
 
     override fun appendUnorderedList(body: () -> Unit) {
