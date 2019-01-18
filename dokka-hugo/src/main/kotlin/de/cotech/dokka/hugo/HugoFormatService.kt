@@ -23,26 +23,58 @@ open class HugoOutputBuilder(to: StringBuilder,
     }
 
     protected open fun appendFrontMatter(nodes: Iterable<DocumentationNode>, to: StringBuilder) {
-        to.appendln("""title = "${getPageLinkTitle(nodes)}"""")
-        to.appendln("""draft = false""")
-        to.appendln("""toc = false""")
-        to.appendln("""type = "javadocs"""")
-
+        to.appendln("title = \"${getPageLinkTitle(nodes)}\"")
+        to.appendln("draft = false")
+        to.appendln("toc = false")
+        to.appendln("type = \"apidocs\"")
+        
+        // Add menu item for all packages
         if (isPackage(nodes)) {
-            to.appendln("""linktitle = "${getPageLinkTitle(nodes)}"""")
-            to.appendln("""[menu.docs]""")
-            to.appendln("""  parent = "API Reference"""")
-            to.appendln("""  weight = 1""")
+            to.appendln("linktitle = \"${getPageLinkTitle(nodes)}\"")
+            to.appendln("[menu.docs]")
+            to.appendln("  parent = \"apidocs\"")
+            to.appendln("  weight = 1")
         }
     }
-    
-    // Hugo markdown (blackfriday) requires table headers
-    // https://github.com/Kotlin/dokka/blob/master/core/src/main/kotlin/Formats/GFMFormatService.kt
+
+    // Use HTML tables to have multiline content in cells. This is not possible with Markdown tables
     override fun appendTable(vararg columns: String, body: () -> Unit) {
-        to.appendln(columns.joinToString(" | ", "| ", " |"))
-        to.appendln("|" + "---|".repeat(columns.size))
+        to.appendln("<table>")
+
+        to.appendln("<thead>")
+        to.appendln("<tr>")
+        columns.forEach {
+            to.appendln("<th>")
+            to.appendln("$it")
+            to.appendln("</th>")
+        }
+        to.appendln("</tr>")
+        to.appendln("</thead>")
+
         body()
+
+        to.appendln("</table>")
     }
+
+    override fun appendTableBody(body: () -> Unit) {
+        to.appendln("<tbody>")
+        body()
+        to.appendln("</tbody>")
+    }
+
+    override fun appendTableRow(body: () -> Unit) {
+        to.appendln("<tr>")
+        body()
+        to.appendln("</tr>")
+    }
+
+    override fun appendTableCell(body: () -> Unit) {
+        to.appendln("<td>")
+        to.appendln("{{% md %}}")
+        body()
+        to.appendln("{{% /md %}}")
+        to.appendln("\n</td>")
+}
 
     override fun appendUnorderedList(body: () -> Unit) {
         if (inTableCell) {

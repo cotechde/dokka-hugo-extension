@@ -15,6 +15,18 @@ This extension is build as a fat-jar, i.e., it includes all dependenices in a si
 
 ``./gradlew shadowJar``
 
+## Requires
+
+This extension is thought as an example how to build a dokka extension.
+It is not working out of the box.
+
+* Currently uses the Hugo academic theme
+* Requires special docs template called "javadocs"
+* Requires shortcode to insert markdown in html. Put `md.html` in your "shortcodes" folder with the content:
+```
+{{ .Inner }}
+```
+
 ## Usage with Gradle
 
 Put into your projects libs folder and configure dokka:
