@@ -14,6 +14,18 @@ open class HugoOutputBuilder(to: StringBuilder,
                                extension: String,
                                impliedPlatforms: List<String>)
     : MarkdownOutputBuilder(to, location, generator, languageService, extension, impliedPlatforms) {
+    
+    override fun appendLink(href: String, body: () -> Unit) {
+        if (inCodeBlock) {
+            // `[Link](/link)` -> ` `[`Link`](/link)` `
+            // whitespaces are important to properly stop code block in Hugo
+            wrap(" `[`", "`]({{< relref \"$href\" >}})` ", body)
+        }
+        else {
+            wrap("[", "]({{< relref \"$href\" >}})", body)
+        }
+    }
+
     override fun appendNodes(nodes: Iterable<DocumentationNode>) {
         to.appendln("+++")
         appendFrontMatter(nodes, to)
@@ -28,7 +40,7 @@ open class HugoOutputBuilder(to: StringBuilder,
         to.appendln("toc = false")
         to.appendln("type = \"apidocs\"")
         
-        // Add menu item for all packages
+        // Add menu item for each package
         if (isPackage(nodes)) {
             to.appendln("linktitle = \"${getPageLinkTitle(nodes)}\"")
             to.appendln("[menu.docs]")
@@ -37,7 +49,7 @@ open class HugoOutputBuilder(to: StringBuilder,
         }
     }
 
-    // Use HTML tables to have multiline content in cells. This is not possible with Markdown tables
+    // Use HTML tables to have multiline content in table cells. This is not possible with Markdown tables
     override fun appendTable(vararg columns: String, body: () -> Unit) {
         to.appendln("<table>")
 
@@ -71,34 +83,38 @@ open class HugoOutputBuilder(to: StringBuilder,
     override fun appendTableCell(body: () -> Unit) {
         to.appendln("<td>")
         to.appendln("{{% md %}}")
+        // TODO: needed?
+//         inTableCell = true
+//         lastTableCellStart = to.length
         body()
         to.appendln("{{% /md %}}")
         to.appendln("</td>")
-}
-
-    override fun appendUnorderedList(body: () -> Unit) {
-        if (inTableCell) {
-            wrapInTag("ul", body)
-        } else {
-            super.appendUnorderedList(body)
-        }
+//         inTableCell = false
     }
 
-    override fun appendOrderedList(body: () -> Unit) {
-        if (inTableCell) {
-            wrapInTag("ol", body)
-        } else {
-            super.appendOrderedList(body)
-        }
-    }
-
-    override fun appendListItem(body: () -> Unit) {
-        if (inTableCell) {
-            wrapInTag("li", body)
-        } else {
-            super.appendListItem(body)
-        }
-    }
+//     override fun appendUnorderedList(body: () -> Unit) {
+//         if (inTableCell) {
+//             wrapInTag("ul", body)
+//         } else {
+//             super.appendUnorderedList(body)
+//         }
+//     }
+// 
+//     override fun appendOrderedList(body: () -> Unit) {
+//         if (inTableCell) {
+//             wrapInTag("ol", body)
+//         } else {
+//             super.appendOrderedList(body)
+//         }
+//     }
+// 
+//     override fun appendListItem(body: () -> Unit) {
+//         if (inTableCell) {
+//             wrapInTag("li", body)
+//         } else {
+//             super.appendListItem(body)
+//         }
+//     }
     
     private fun isPackage(nodes: Iterable<DocumentationNode>): Boolean {
         val node = nodes.singleOrNull()
@@ -159,7 +175,7 @@ open class HugoFormatService(
             generator: NodeLocationAwareGenerator,
             signatureGenerator: LanguageService,
             @Named(impliedPlatformsName) impliedPlatforms: List<String>
-    ) : this(generator, signatureGenerator, "html", impliedPlatforms)
+    ) : this(generator, signatureGenerator, "md", impliedPlatforms)
 
     override fun createOutputBuilder(to: StringBuilder, location: Location): FormattedOutputBuilder =
             HugoOutputBuilder(to, location, generator, languageService, extension, impliedPlatforms)
