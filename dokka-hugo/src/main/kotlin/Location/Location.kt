@@ -36,7 +36,7 @@ fun relativePathToNode(qualifiedName: List<String>, hasMembers: Boolean): String
         // leaf node, use file in owner's folder
         parts.joinToString("/")
     } else {
-        parts.joinToString("/") + (if (parts.none()) "" else "/") + "index"
+        parts.joinToString("/") + (if (parts.none()) "" else "/") + "_index"
     }
 }
 
