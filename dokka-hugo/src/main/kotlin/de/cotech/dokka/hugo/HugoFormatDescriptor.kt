@@ -9,7 +9,7 @@ import org.jetbrains.dokka.Formats.*
 class HugoFormatDescriptor
     : FileGeneratorBasedFormatDescriptor(),
         DefaultAnalysisComponent,
-        DefaultAnalysisComponentServices by KotlinAsJava {
+        DefaultAnalysisComponentServices by KotlinAsKotlin {
     override val generatorServiceClass = FileGenerator::class
     override val outlineServiceClass: KClass<out OutlineFormatService>? = null
     override val packageListServiceClass = DefaultPackageListService::class
