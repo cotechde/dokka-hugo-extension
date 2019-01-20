@@ -110,6 +110,19 @@ open class HugoOutputBuilder(to: StringBuilder,
         super.appendOrderedList(body)
     }
     
+    // copied from MarkdownFormatService.kt, but uses Java by default!
+    override fun appendBlockCode(language: String, body: () -> Unit) {
+        inCodeBlock = true
+        ensureParagraph()
+        to.appendln(if (language.isEmpty()) "``` java" else "``` $language")
+        body()
+        ensureNewline()
+        to.appendln("```")
+        appendLine()
+        inCodeBlock = false
+    }
+
+    
     private fun appendNewline() {
         while (to.endsWith(' ')) {
             to.setLength(to.length - 1)
