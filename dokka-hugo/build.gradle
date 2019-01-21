@@ -1,3 +1,6 @@
+//import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+//import org.jetbrains.PluginXmlTransformer
+
 apply plugin: "kotlin"
 apply plugin: "com.github.johnrengelman.shadow"
 
@@ -13,12 +16,25 @@ compileTestKotlin {
 dependencies {
     //compile "org.jetbrains.kotlin:kotlin-stdlib:$bundled_kotlin_compiler_version"
     //compile "org.jetbrains.kotlin:kotlin-reflect:$bundled_kotlin_compiler_version"
-    
-
     //compile "org.jetbrains.kotlin:kotlin-compiler:$bundled_kotlin_compiler_version"
     //compile "org.jetbrains.kotlin:kotlin-script-runtime:$bundled_kotlin_compiler_version"
 
-    compile "org.jetbrains.dokka:dokka-fatjar:0.9.17"
+    compile "org.jetbrains.dokka:dokka-fatjar:$dokka_version"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
 
 jar {
@@ -29,13 +45,16 @@ jar {
 
 // based on https://github.com/Kotlin/dokka/blob/master/runners/fatjar/build.gradle
 shadowJar {
-    baseName = 'dokka-hugo-fatjar-0.9.17'
+    baseName = 'dokka-hugo-fatjar'
     classifier = null
-    version = null
+    version = "$dokka_version"
    
     configurations {
         exclude compileOnly
     }
+    
+    //transform(ServiceFileTransformer)
+    //transform(PluginXmlTransformer)
 
     exclude 'colorScheme/**'
     exclude 'fileTemplates/**'
@@ -45,4 +64,49 @@ shadowJar {
     exclude 'src/**'
 
     relocate('kotlin.reflect.full', 'kotlin.reflect')
+}
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        dokkaFatJar(MavenPublication) { publication ->
+            project.shadow.component(publication)
+            artifact sourcesJar
+            artifact javadocJar
+            
+            version "$dokka_version"
+
+            groupId 'de.cotech'
+            artifactId = 'dokka-hugo-fatjar'
+        }
+    }
+}
+
+bintrayPublication(project, ["dokkaFatJar"])
+
+// based on https://github.com/Kotlin/dokka/blob/master/build.gradle
+def bintrayPublication(project, List<String> _publications) {
+    configure(project, {
+        apply plugin: 'com.jfrog.bintray'
+
+        bintray {
+            user = System.getenv('BINTRAY_USER')
+            key = System.getenv('BINTRAY_KEY')
+
+            pkg {
+                repo = 'maven'
+                name = 'dokka-hugo'
+                userOrg = 'cotech'
+                desc = 'Dokka extension to generate Hugo sites'
+                vcsUrl = 'https://github.com/cotechde/dokka-hugo-extension.git'
+                licenses = ['Apache-2.0']
+                version {
+                    name = "$dokka_version"
+                }
+            }
+
+            publications = _publications
+        }
+    })
 }
