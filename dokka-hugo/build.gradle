@@ -27,8 +27,22 @@ jar {
     }
 }
 
+// based on https://github.com/Kotlin/dokka/blob/master/runners/fatjar/build.gradle
 shadowJar {
-   baseName = 'dokka-hugo-fatjar-0.9.17'
-   classifier = null
-   version = null
+    baseName = 'dokka-hugo-fatjar-0.9.17'
+    classifier = null
+    version = null
+   
+    configurations {
+        exclude compileOnly
+    }
+
+    exclude 'colorScheme/**'
+    exclude 'fileTemplates/**'
+    exclude 'inspectionDescriptions/**'
+    exclude 'intentionDescriptions/**'
+
+    exclude 'src/**'
+
+    relocate('kotlin.reflect.full', 'kotlin.reflect')
 }
