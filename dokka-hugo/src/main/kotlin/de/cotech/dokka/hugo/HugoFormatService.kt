@@ -47,13 +47,13 @@ open class HugoOutputBuilder(to: StringBuilder,
         to.appendln("title = \"${getPageLinkTitle(nodes)}\"")
         to.appendln("draft = false")
         to.appendln("toc = false")
-        to.appendln("type = \"apidocs\"")
+        to.appendln("type = \"reference\"")
         
         // Add menu item for each package
         if (isPackage(nodes)) {
             to.appendln("linktitle = \"${getPageLinkTitle(nodes)}\"")
             to.appendln("[menu.docs]")
-            to.appendln("  parent = \"apidocs\"")
+            to.appendln("  parent = \"hw-security-reference\"")
             to.appendln("  weight = 1")
         }
     }
