@@ -1,3 +1,9 @@
+# DEPRECATED
+
+Deprecated and no longer working with latest Dokka.
+
+Please use [dokka-hugo-plugin](https://github.com/cotechde/dokka-hugo-plugin).
+
 # Dokka Hugo Extension
 
 This library is a [Dokka](https://github.com/Kotlin/dokka) extension.
